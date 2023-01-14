@@ -1,59 +1,128 @@
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 3001;
-
-app.get("/", (req, res) => res.type('html').send(html));
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const express = require('express')
+var bodyParser = require('body-parser')
+const fs=require('fs');
+const path =require('path');
 
 
-const html = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Hello from Render!</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          disableForReducedMotion: true
-        });
-      }, 500);
-    </script>
-    <style>
-      @import url("https://p.typekit.net/p.css?s=1&k=vnd5zic&ht=tk&f=39475.39476.39477.39478.39479.39480.39481.39482&a=18673890&app=typekit&e=css");
-      @font-face {
-        font-family: "neo-sans";
-        src: url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"), url("https://use.typekit.net/af/00ac0a/00000000000000003b9b2033/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-        font-style: normal;
-        font-weight: 700;
-      }
-      html {
-        font-family: neo-sans;
-        font-weight: 700;
-        font-size: calc(62rem / 16);
-      }
-      body {
-        background: white;
-      }
-      section {
-        border-radius: 1em;
-        padding: 1em;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-right: -50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <section>
-      Hello from Render!
-    </section>
-  </body>
-</html>
-`
+const url=require('url');
+const app = express()
+
+
+const port = 5000
+
+// create application/json parser
+var jsonParser = bodyParser.json()
+ 
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
+// // POST /login gets urlencoded bodies
+// app.post('/login', urlencodedParser, function (req, res) {
+//     res.send('welcome, ' + req.body.username)
+//   })
+   
+//   // POST /api/users gets JSON bodies
+//   app.post('/api/users', jsonParser, function (req, res) {
+//     // create user in req.body
+//   })
+
+
+
+app.get(['/form', '/', ],(req, res) => {
+    let filepath=path.join(__dirname,req.url==="/"?"index.html":req.url)
+    let extname=path.extname(filepath);
+    let ctype="text/html";
+    switch (extname) {
+        case 'js' :
+            ctype="text/javascript"
+            break;
+        case 'css' :
+            ctype="text/css"
+            break;
+        case 'json' :
+            ctype="application/json"
+            break;
+        case '.png' :
+            ctype="image/png"
+            break;
+    
+    }
+    if (ctype==='text/html' && extname==='') {
+        filepath+='.html'; 
+    }
+
+    // let otherpath=`I:\\a_programming\\Web\\Internet Engineer\\React\\my-react-app\\src\\index.js`
+    // ctype='text/javascript'
+    fs.readFile(filepath,(err,data)=>{
+        if (err) {
+            console.log(err);
+        }
+        else{
+            res.writeHead(200,{'content-type':ctype});
+            res.end(data);
+        }
+    })
+   
+    console.log('filepath',filepath);
+    console.log(`extname `,extname);
+    console.log(`ctype `,ctype);
+  
+ 
+})
+
+// app.get('/submit-get',(req, res) => {
+//     console.log('submit clicked');
+//     // const username = req.body.username
+//     var q = url.parse(req.url, true);
+//     var qdata = q.query; 
+//     console.log(`username is ${qdata.username}`);
+    
+//     fs.readFile('submitted.html',(err,data)=>{
+//         if (err) {
+//             console.log(err);
+//         }
+//         else{
+//             console.log('read');
+//             res.writeHead(200,{'content-type':'text/html'});
+//             res.end(`<Span>${qdata.username}</span>`+data);
+//         }
+//     })
+    
+// })
+
+
+
+
+app.post('/submit',urlencodedParser, (req, res) => {
+    console.log('submit clicked');
+    const name = req.body.name
+    const date = req.body.date
+    const adress = req.body.adress
+    const email = req.body.email
+    console.log(name);
+    console.log(`<Span>${name} ${date} ${adress} ${email} type=post</span>`);
+    console.log('read');
+    res.writeHead(200,{'content-type':'text/html'});
+    console.log(req.body);
+    console.log(`url is ${JSON.stringify(req.body)}`);
+    // fs.readFile('I:\\a_programming\\Web\\Internet Engineer\\Node\\testnode1\\submitted.html',(err,data)=>{
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     else{
+    //         console.log('read');
+    //         res.writeHead(200,{'content-type':'text/html'});
+    //         console.log(req.body);
+    //         console.log(`url is ${JSON.stringify(req.body)}`);
+    //         // res.end(JSON.stringify(req.body));
+    //         // res.status(204).send();
+    //     }
+
+    // })
+    
+    
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
